@@ -150,7 +150,6 @@ class VGG2(nn.Module):
 
 
 def quant_repair(model, model_s, pth_l, pth_s, IM, lb, ub, new_pth, alpha, fx):
-    # max_range = [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
     max_range = compute_quant_net_diff(model, pth_l, pth_s, IM, lb, ub)
     max_range = np.array(max_range)
     optimizer = optim.SGD(model_s.parameters(), lr=0.0001, momentum=0.9)
@@ -206,10 +205,8 @@ def quant_repair(model, model_s, pth_l, pth_s, IM, lb, ub, new_pth, alpha, fx):
 
 
 def pruning_repair(model, model_s, pth_l, pth_s, IM, lb, ub, new_pth, alpha, p_method):
-    # max_range = [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
     max_range = compute_prune_net_diff(model, pth_l, pth_s, IM, lb, ub)
     max_range = np.array(max_range)
-    # model_s.load_state_dict(torch.load(model_s_pth, map_location=torch.device('cpu')))
     optimizer = optim.SGD(model_s.parameters(), lr=0.0001, momentum=0.9)
     loss_func = torch.nn.MSELoss()
     dis_list = []
@@ -307,10 +304,6 @@ def pruning_repair(model, model_s, pth_l, pth_s, IM, lb, ub, new_pth, alpha, p_m
 
 def dis_quant_repair(model, teacher, student, pth_l, pth_s, IM, lb, ub, new_pth, fx, T, learning_rate,
                      alpha, dis_add):
-    # max_range = np.array([[-11.65828443, -11.6145396], [-0.21285476, 0.17522383], [-2.11043953, -1.72044767],
-    #                       [4.38050629, 4.782895], [-1.96445715, -1.57213932], [10.9333753, 10.97493323],
-    #                       [2.33315596, 2.3408475],
-    #                       [0.61956997, 0.62448724], [-0.19625076, -0.19232374], [-0.84916031, -0.45971217]])
     max_range = compute_quant_net_diff(model, pth_l, pth_s, IM, lb, ub)
     max_range = np.array(max_range)
     dis_list = []
@@ -393,9 +386,6 @@ def dis_quant_repair(model, teacher, student, pth_l, pth_s, IM, lb, ub, new_pth,
 
 def dis_pruning_repair(model, teacher, student, pth_l, pth_s, IM, lb, ub, new_pth, T, learning_rate,
                      alpha, dis_add, p_method):
-    # max_range = np.array([[-11.65828443, -11.6145396], [-0.21285476, 0.17522383], [-2.11043953, -1.72044767],
-    #              [4.38050629, 4.782895], [-1.96445715, -1.57213932], [10.9333753, 10.97493323], [2.33315596, 2.3408475],
-    #              [0.61956997, 0.62448724], [-0.19625076, -0.19232374], [-0.84916031, -0.45971217]])
     max_range = compute_prune_net_diff(model, pth_l, pth_s, IM, lb, ub)
     max_range = np.array(max_range)
     dis_list = []
@@ -523,8 +513,6 @@ if __name__ == '__main__':
     lb = -0.05
     ub = 0.05
 
-    # al = 0.2
-    # print("alpha = 0.2")
     net1 = torch.load('../data/cifar_vgg_l.pth', map_location=torch.device('cpu'))
     print("Rebuild Dataset Retraining")
     for al in (0.5, 0.2, 0.7, 0.9):
@@ -597,8 +585,7 @@ if __name__ == '__main__':
     print("Knowledge Distillation with Discrepancy")
     for al in (0.2, 0.5, 0.7, 0.9):
         print("alpha = %.1f" % al)
-        # if al != 0.9:
-        #     continue
+
         print("FX Mode QAT")
         net2 = torch.load('../data/cifar_vgg_fx_s.pth', map_location=torch.device('cpu'))
         temp1 = net2['conv1_1_input_scale_0']
